@@ -1,16 +1,28 @@
 from elevenlabs import generate, play, save, set_api_key
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 
 class Text(BaseModel):
     text: str
+    voice: str
 
 
 app = FastAPI()
 
-AUDIOS_PATH = "frontend/src/audios/"
-AUDIO_PATH = "/audios/"
+
+origins = [
+    "moz-extension://751e9ade-cef2-4f45-b45f-2b6e40886c14"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 # audio = generate(
 #     text="Hello! 你好! Hola! नमस्ते! Bonjour! こんにちは! مرحبا! 안녕하세요! Ciao! Cześć! Привіт! வணக்கம்!",
 #     voice="Bella",
@@ -25,7 +37,7 @@ async def audio(text: Text):
     set_api_key("086c3d3bde304e2154ca2c030d661ee5")
     audioFile = generate(
         text=text.text,
-        voice="Bella",
+        voice=text.voice,
         model="eleven_multilingual_v2"
     )
     # play(audioFile)
